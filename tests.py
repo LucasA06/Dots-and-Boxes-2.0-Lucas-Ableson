@@ -2,19 +2,19 @@ from tkinter import *
 import random
 
 win = Tk()
-win.geometry("1960x1080")
+win.geometry("810x810")
 win.config(bg='white')
 win.title('Make the Longest Line!!')
 
-c = Canvas(win, width=800, height=800, bg="white")
+c = Canvas(win, width=700, height =700, bg="white")
 c.pack()
 
 dots = []
 lines = []
 
-grid_size = 7
-grid_range = 6
-grid_range2 = 7
+grid_size = 6
+grid_range = 5
+grid_range2 = 6
 line_width = 12
 dot_radius = 7
 grid_gap = 100
@@ -47,7 +47,7 @@ player1_label.pack()
 player2_label = Label(win, text="Player 2 is Red", fg="firebrick", bg='white')
 player2_label.pack()
 
-# Variable to track current player
+
 current_player = 1
 
 def player_move(event):
@@ -58,13 +58,9 @@ def player_move(event):
     if color == 'white':
         if current_player == 1:
             c.itemconfigure(item, fill='seagreen')
-            player1_label.config(fg='black')
-            player2_label.config(fg='firebrick')
             current_player = 2
         else:
             c.itemconfigure(item, fill='firebrick')
-            player1_label.config(fg='seagreen')
-            player2_label.config(fg='black')
             current_player = 1
 
 
