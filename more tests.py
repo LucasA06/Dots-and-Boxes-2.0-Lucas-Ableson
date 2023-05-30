@@ -38,14 +38,27 @@ for i in range(grid_size):
         dot = c.create_oval(x - dot_radius, y - dot_radius, x + dot_radius, y + dot_radius, fill='black')
         dots.append(dot)
 
-# Player and computer labels
-welcome_label = Label(win, text="Click a gap between dots to start the game!!", fg='black',font= (20))
+# Player labels
+welcome_label = Label(win, text="Click a gap between dots to start the game!!", fg='black', font=(20))
 welcome_label.pack()
 player_label = Label(win, text="You are Green", fg="seagreen")
 player_label.pack()
 computer_label = Label(win, text="Computer is Red", fg="firebrick")
 computer_label.pack()
 
+def count_longest_line(color):
+    max_length = 0
+    visited = set()
+
+    for line in lines:
+        if c.itemcget(line, 'fill') == color and line not in visited:
+            connected_lines = find_connected_lines(line, color, visited)
+            length = len(connected_lines)
+
+            if length > max_length:
+                max_length = length
+
+    return max_length
 
 def find_connected_lines(item, color, visited):
     connected = [item]
@@ -62,6 +75,25 @@ def find_connected_lines(item, color, visited):
                 queue.append(neighbor)
 
     return connected
+
+def update_longest_lines():
+    player_longest_line = count_longest_line('seagreen')
+    computer_longest_line = count_longest_line('firebrick')
+
+    player_label.config(text=f"You are Green (Longest Line: {player_longest_line})")
+    computer_label.config(text=f"Computer is Red (Longest Line: {computer_longest_line})")
+
+def player_move(event):
+    item = event.widget.find_closest(event.x, event.y)[0]
+    color = c.itemcget(item, 'fill')
+    if color == 'white':
+        c.itemconfigure(item, fill='seagreen')
+        update_longest_lines()
+        computer_move()
+
+        # Check if the game is over
+        if not [line for line in lines if c.itemcget(line, 'fill') == 'white']:
+            game_over()
 
 def computer_move():
     white_lines = [line for line in lines if c.itemcget(line, 'fill') == 'white']
@@ -80,13 +112,20 @@ def computer_move():
 
         if best_line:
             c.itemconfigure(best_line, fill='firebrick')
+            update_longest_lines()
 
-def click_line(event):
-    item = event.widget.find_closest(event.x, event.y)[0]
-    color = c.itemcget(item, 'fill')
-    if color == 'white':
-        c.itemconfigure(item, fill='seagreen')
-        computer_move()
+def game_over():
+    player_longest_line = count_longest_line('seagreen')
+    computer_longest_line = count_longest_line('firebrick')
+
+    result_label = Label(win, text="Game Over!", fg="black", font=(20))
+    result_label.pack()
+
+    player_result_label = Label(win, text=f"Player's Longest Line: {player_longest_line}", fg="seagreen")
+    player_result_label.pack()
+
+    computer_result_label = Label(win, text=f"Computer's Longest Line: {computer_longest_line}", fg="firebrick")
+    computer_result_label.pack()
 
 def reset_canvas():
     c.delete("all")
@@ -110,9 +149,8 @@ def reset_canvas():
             dot = c.create_oval(x - dot_radius, y - dot_radius, x + dot_radius, y + dot_radius, fill='black')
             dots.append(dot)
 
-
-reset_button = Button(win, text="Click To Reset", command=reset_canvas, fg='gold',bg='black')
+reset_button = Button(win, text="Click To Reset", command=reset_canvas, fg='gold', bg='black')
 reset_button.pack()
 
-c.bind('<Button-1>', click_line)
+c.bind('<Button-1>', player_move)
 win.mainloop()
