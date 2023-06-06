@@ -1,6 +1,7 @@
 from tkinter import *
 import sys
 import os
+from tkVideoPlayer import TkinterVideo
 
 win = Tk()
 win.geometry("610x610")
@@ -8,6 +9,17 @@ win.title('Make the Longest Line!!')
 
 dots = []
 lines = []
+
+videoplayer = TkinterVideo(master=win, scaled=True)
+videoplayer.load(r"lines.mp4")
+videoplayer.pack(expand=True, fill="both")
+videoplayer.play()
+
+def loop_video():
+    videoplayer.play()
+    win.after(100, loop_video)
+
+win.after(100, loop_video)
 
 grid_size = 4
 grid_range = 3
