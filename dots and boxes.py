@@ -1,23 +1,26 @@
 from tkinter import *
 import sys
 import os
-from PIL import ImageTk, Image
 from tkVideoPlayer import TkinterVideo
+import pygame
 
 win = Tk()
 win.geometry("610x610")
 win.title('Make the Longest Line!!')
 
 videoplayer = TkinterVideo(master=win, scaled=True)
-videoplayer.load(r"lines.mp4")
+videoplayer.load(r"lines2.mp4")
 videoplayer.pack(expand=True, fill="both")
 videoplayer.play()
 
 def loop_video():
     videoplayer.play()
     win.after(1, loop_video)
-
 win.after(1, loop_video)
+
+pygame.mixer.init()
+pygame.mixer.music.load("1.wav")
+pygame.mixer.music.play(loops=-1)
 
 win.resizable(False, False)
 
@@ -41,11 +44,11 @@ def start_game_two_players():
 
 welcome = Label(win, text="WELCOME TO LONGEST LINE!", fg='purple',bg='black', font=('Arial Black',21,'bold'),width=25,height=2)
 welcome.place(x=80, y=150)
-one_player_button = Button(win, text="Play Against Computer", command=start_game_computer, fg='black', bg='skyblue', font=('Oswald',15,'bold'),width=20,height=2, activebackground='goldenrod', activeforeground='white', relief='raised')
+one_player_button = Button(win, text="Play Against Computer", command=start_game_computer, fg='black', bg='skyblue', font=('Oswald',15,'bold'),width=20,height=2, activebackground='purple', activeforeground='black', relief='ridge')
 one_player_button.place(x=200, y=380)
-two_player_button = Button(win, text="Play Against Friend", command=start_game_two_players, fg='black', bg='seagreen', font=('Oswald',15,'bold'), width=20,height=2, activebackground='goldenrod', activeforeground='white', relief='raised')
+two_player_button = Button(win, text="Play Against Friend", command=start_game_two_players, fg='black', bg='seagreen', font=('Oswald',15,'bold'), width=20,height=2, activebackground='purple', activeforeground='black', relief='ridge')
 two_player_button.place(x=200, y=300)
-quit_button = Button(win, text="QUIT", command=win.destroy, fg='black', bg='firebrick', font=('Oswald',15,'bold'), width=20,height=2, activebackground='goldenrod', activeforeground='white', relief='raised')
+quit_button = Button(win, text="QUIT", command=win.destroy, fg='black', bg='firebrick', font=('Oswald',15,'bold'), width=20,height=2, activebackground='purple', activeforeground='black', relief='ridge')
 quit_button.place(x=200, y=460)
 
 def create_game_window():
