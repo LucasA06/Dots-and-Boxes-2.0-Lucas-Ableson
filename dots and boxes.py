@@ -19,8 +19,14 @@ def loop_video():
 win.after(1, loop_video)
 
 pygame.mixer.init()
-pygame.mixer.music.load("1.wav")
-pygame.mixer.music.play(loops=-1)
+pygame.mixer.music.load("1.mp3")
+music = pygame.mixer.music.play(loops=-1)    
+
+def stop_music():
+    pygame.mixer.music.stop()
+
+def play_music():
+    pygame.mixer.music.play(loops=-1)
 
 win.resizable(False, False)
 
@@ -33,22 +39,26 @@ grid_range2 = 4
 line_width = 12
 dot_radius = 7
 grid_gap = 100
+line_sound = pygame.mixer.Sound('2.wav')
+finish_sound = pygame.mixer.Sound("3.wav")
 
 def start_game_computer():
+    stop_music()  # Stop the music
     win.withdraw()
     create_game_window()
 
 def start_game_two_players():
+    stop_music()  # Stop the music
     win.withdraw()
     create_game_window2()
 
 welcome = Label(win, text="WELCOME TO LONGEST LINE!", fg='purple',bg='black', font=('Arial Black',21,'bold'),width=25,height=2)
 welcome.place(x=80, y=150)
-one_player_button = Button(win, text="Play Against Computer", command=start_game_computer, fg='black', bg='skyblue', font=('Oswald',15,'bold'),width=20,height=2, activebackground='purple', activeforeground='black', relief='ridge')
+one_player_button = Button(win, text="Play Against Computer", command=start_game_computer, fg='black', bg='skyblue', font=('Oswald',15,'bold'),width=20,height=2, activebackground='purple', activeforeground='black', relief='flat')
 one_player_button.place(x=200, y=380)
-two_player_button = Button(win, text="Play Against Friend", command=start_game_two_players, fg='black', bg='seagreen', font=('Oswald',15,'bold'), width=20,height=2, activebackground='purple', activeforeground='black', relief='ridge')
+two_player_button = Button(win, text="Play Against Friend", command=start_game_two_players, fg='black', bg='seagreen', font=('Oswald',15,'bold'), width=20,height=2, activebackground='purple', activeforeground='black', relief='flat')
 two_player_button.place(x=200, y=300)
-quit_button = Button(win, text="QUIT", command=win.destroy, fg='black', bg='firebrick', font=('Oswald',15,'bold'), width=20,height=2, activebackground='purple', activeforeground='black', relief='ridge')
+quit_button = Button(win, text="QUIT", command=win.destroy, fg='black', bg='firebrick', font=('Oswald',15,'bold'), width=20,height=2, activebackground='purple', activeforeground='black', relief='flat')
 quit_button.place(x=200, y=460)
 
 def create_game_window():
@@ -128,7 +138,9 @@ def create_game_window():
         color = c.itemcget(item, 'fill')
         if color == 'white':
             c.itemconfigure(item, fill='seagreen')
+            line_sound.play()
             computer_move()
+            check_game_over()
 
     def reset_canvas():
         c.delete("all")
@@ -151,6 +163,11 @@ def create_game_window():
                 y = 100 + j * grid_gap
                 dot = c.create_oval(x - dot_radius, y - dot_radius, x + dot_radius, y + dot_radius, fill='black')
                 dots.append(dot)
+
+    def check_game_over():
+        white_lines = [line for line in lines if c.itemcget(line, 'fill') == 'white']
+        if not white_lines:
+            finish_sound.play()
 
     def main_menu():
         game_win.destroy()
@@ -204,6 +221,7 @@ def create_game_window2():
         nonlocal current_player
         item = event.widget.find_closest(event.x, event.y)[0]
         color = c.itemcget(item, 'fill')
+        line_sound.play()
 
         if color == 'white':
             if current_player == 1:
@@ -214,6 +232,7 @@ def create_game_window2():
                 c.itemconfigure(item, fill='seagreen')
                 player1_label.config(text="Player 1's Turn (Red)",fg='firebrick')
                 current_player = 1
+        check_game_over()
 
     def reset_canvas():
         c.delete("all")
@@ -236,10 +255,17 @@ def create_game_window2():
                 y = 100 + j * grid_gap
                 dot = c.create_oval(x - dot_radius, y - dot_radius, x + dot_radius, y + dot_radius, fill='black')
                 dots.append(dot)
+    
+    def check_game_over():
+        white_lines = [line for line in lines if c.itemcget(line, 'fill') == 'white']
+        if not white_lines:
+            finish_sound.play()
 
     def main_menu():
+        play_music()
         game_win.destroy()
         win.deiconify()
+
 
     reset_button = Button(game_win, text="Reset", command=reset_canvas, fg='gold', bg='black',width=20)
     reset_button.pack()
