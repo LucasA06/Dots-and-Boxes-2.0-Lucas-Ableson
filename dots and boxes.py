@@ -9,7 +9,7 @@ win.geometry("610x610")
 win.title('Make the Longest Line!!')
 
 videoplayer = TkinterVideo(master=win, scaled=True)
-videoplayer.load(r"lines2.mp4")
+videoplayer.load(r"lines.mp4")
 videoplayer.pack(expand=True, fill="both")
 videoplayer.play()
 
@@ -141,6 +141,7 @@ def create_game_window():
             line_sound.play()
             computer_move()
             check_game_over()
+            
 
     def reset_canvas():
         c.delete("all")
@@ -170,6 +171,7 @@ def create_game_window():
             finish_sound.play()
 
     def main_menu():
+        play_music()
         game_win.destroy()
         win.deiconify()
 
