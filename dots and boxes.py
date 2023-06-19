@@ -276,4 +276,3 @@ def create_game_window2():
     game_win.mainloop()
 
 win.mainloop()
-win.mainloop()
