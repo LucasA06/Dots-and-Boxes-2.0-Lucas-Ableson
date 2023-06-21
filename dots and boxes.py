@@ -19,7 +19,7 @@ def loop_video():
 win.after(1, loop_video)
 
 pygame.mixer.init()
-pygame.mixer.music.load("1.mp3")
+pygame.mixer.music.load("1.wav")
 music = pygame.mixer.music.play(loops=-1)    
 
 def stop_music():
@@ -69,6 +69,9 @@ def create_game_window():
 
     c = Canvas(game_win, width=500, height=500, bg='white')
     c.pack()
+
+    player_lines = []
+    computer_lines = []
 
     for i in range(grid_range):
         for j in range(grid_range2):
@@ -132,6 +135,7 @@ def create_game_window():
 
             if best_line:
                 c.itemconfigure(best_line, fill='firebrick')
+        computer_lines.append(best_line)
 
     def click_line(event):
         item = event.widget.find_closest(event.x, event.y)[0]
@@ -140,6 +144,7 @@ def create_game_window():
             c.itemconfigure(item, fill='seagreen')
             line_sound.play()
             computer_move()
+            player_lines.append(item)
             check_game_over()
             
 
@@ -166,14 +171,20 @@ def create_game_window():
                 dots.append(dot)
 
     def check_game_over():
-        white_lines = [line for line in lines if c.itemcget(line, 'fill') == 'white']
-        if not white_lines:
-            finish_sound.play()
+            white_lines = [line for line in lines if c.itemcget(line, 'fill') == 'white']
+            if not white_lines:
+                finish_sound.play()
+            player1_count = len([line for line in player_lines if c.itemcget(line, 'fill') == 'seagreen'])
+            player2_count = len([line for line in computer_lines if c.itemcget(line, 'fill') == 'firebrick'])
 
+            print(player1_count, player2_count)
     def main_menu():
         play_music()
         game_win.destroy()
         win.deiconify()
+
+        return player_lines, computer_lines
+    print(player_lines, computer_lines)
 
     reset_button = Button(game_win, text="Reset", command=reset_canvas, fg='gold', bg='black',width=20)
     reset_button.pack()
@@ -191,6 +202,9 @@ def create_game_window2():
 
     c = Canvas(game_win, width=500, height=500, bg="white")
     c.pack()
+
+    player1_lines = []
+    player2_lines = []
 
     for i in range(grid_range):
         for j in range(grid_range2):
@@ -228,10 +242,12 @@ def create_game_window2():
         if color == 'white':
             if current_player == 1:
                 c.itemconfigure(item, fill='firebrick')
+                player1_lines.append(item)
                 player1_label.config(text="Player 2's Turn (Green)",fg='seagreen')
                 current_player = 2
             else:
                 c.itemconfigure(item, fill='seagreen')
+                player2_lines.append(item)
                 player1_label.config(text="Player 1's Turn (Red)",fg='firebrick')
                 current_player = 1
         check_game_over()
@@ -257,17 +273,21 @@ def create_game_window2():
                 y = 100 + j * grid_gap
                 dot = c.create_oval(x - dot_radius, y - dot_radius, x + dot_radius, y + dot_radius, fill='black')
                 dots.append(dot)
-    
+
     def check_game_over():
         white_lines = [line for line in lines if c.itemcget(line, 'fill') == 'white']
         if not white_lines:
             finish_sound.play()
+        player1_count = len([line for line in player1_lines if c.itemcget(line, 'fill') == 'firebrick'])
+        player2_count = len([line for line in player2_lines if c.itemcget(line, 'fill') == 'seagreen'])
+
+        print(player1_count, player2_count)
+
 
     def main_menu():
         play_music()
         game_win.destroy()
         win.deiconify()
-
 
     reset_button = Button(game_win, text="Reset", command=reset_canvas, fg='gold', bg='black',width=20)
     reset_button.pack()
