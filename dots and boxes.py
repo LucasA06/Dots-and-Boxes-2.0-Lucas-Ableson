@@ -19,7 +19,7 @@ def loop_video():
 win.after(1, loop_video)
 
 pygame.mixer.init()
-pygame.mixer.music.load("1.wav")
+pygame.mixer.music.load("1.mp3")
 music = pygame.mixer.music.play(loops=-1)    
 
 def stop_music():

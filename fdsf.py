@@ -19,7 +19,7 @@ def loop_video():
 win.after(1, loop_video)
 
 pygame.mixer.init()
-pygame.mixer.music.load("1.wav")
+pygame.mixer.music.load("1.mp3")
 music = pygame.mixer.music.play(loops=-1)    
 
 def stop_music():
@@ -267,36 +267,49 @@ def create_game_window2():
                 current_player = 1
         check_game_over()
 
-    def reset_canvas():
-        c.delete("all")
-        for i in range(grid_range):
-            for j in range(grid_range2):
-                x = 100 + i * grid_gap
-                y = 100 + j * grid_gap
-                line = c.create_line(x, y, x + grid_gap, y, width=line_width, fill='white')
-                lines.append(line)
-        for j in range(grid_range):
-            for i in range(grid_range2):
-                x = 100 + i * grid_gap
-                y = 100 + j * grid_gap
-                line = c.create_line(x, y, x, y + grid_gap, width=line_width, fill='white')
-                lines.append(line)
+    def reset_button():
+        python = sys.executable
+        os.execl(python, python, * sys.argv)
 
-        for i in range(grid_size):
-            for j in range(grid_size):
-                x = 100 + i * grid_gap
-                y = 100 + j * grid_gap
-                dot = c.create_oval(x - dot_radius, y - dot_radius, x + dot_radius, y + dot_radius, fill='black')
-                dots.append(dot)
+    def find_connected_lines(item, color, visited):
+        connected = [item]
+        queue = [item]
+
+        while queue:
+            current = queue.pop(0)
+            neighbors = c.find_overlapping(*c.coords(current))
+
+            for neighbor in neighbors:
+                if neighbor in lines and neighbor not in visited and c.itemcget(neighbor, 'fill') == color:
+                    connected.append(neighbor)
+                    visited.add(neighbor)
+                    queue.append(neighbor)
+
+        return connected
+    
+    def count_connected_lines(lines):
+        visited = {0}
+        max_length = 0
+
+        for line in lines:
+            if line not in visited:
+             connected_lines = find_connected_lines(line, c.itemcget(line, 'fill'), visited)
+            length = len(connected_lines)
+
+            if length > max_length:
+                max_length = length
+
+        return max_length
 
     def check_game_over():
         white_lines = [line for line in lines if c.itemcget(line, 'fill') == 'white']
         if not white_lines:
             finish_sound.play()
-        player1_count = len([line for line in player1_lines if c.itemcget(line, 'fill') == 'firebrick'])
-        player2_count = len([line for line in player2_lines if c.itemcget(line, 'fill') == 'seagreen'])
+            player_max_length = count_connected_lines(player1_lines)
+            player2_max_length = count_connected_lines(player2_lines)
 
-        print(player1_count, player2_count)
+            print("Player's max connected lines:", player_max_length)
+            print("Player2's max connected lines:", player2_max_length) 
 
 
     def main_menu():
@@ -304,7 +317,7 @@ def create_game_window2():
         game_win.destroy()
         win.deiconify()
 
-    reset_button = Button(game_win, text="Reset", command=reset_canvas, fg='gold', bg='black',width=20)
+    reset_button = Button(game_win, text="Reset", command=reset_button, fg='gold', bg='black',width=20)
     reset_button.pack()
     main_menu = Button(game_win, text='Main Menu', command= main_menu, fg='gold', bg='black',width=20)
     main_menu.pack()
@@ -313,3 +326,4 @@ def create_game_window2():
     game_win.mainloop()
 
 win.mainloop()
+
