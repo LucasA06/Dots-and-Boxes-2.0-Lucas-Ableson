@@ -63,6 +63,9 @@ def create_game_window():
     c = Canvas(game_win, width=500, height=500, bg='white')
     c.pack()
 
+    player_lines = []
+    computer_lines = []
+
     for i in range(grid_range):
         for j in range(grid_range2):
             x = 100 + i * grid_gap
@@ -108,6 +111,20 @@ def create_game_window():
 
         return connected
 
+    def count_connected_lines(lines):
+        visited = {0}
+        max_length = 0
+
+        for line in lines:
+            if line not in visited:
+                connected_lines = find_connected_lines(line, c.itemcget(line, 'fill'), visited)
+                length = len(connected_lines)
+
+                if length > max_length:
+                    max_length = length
+
+        return max_length
+
     def computer_move():
         white_lines = [line for line in lines if c.itemcget(line, 'fill') == 'white']
         if white_lines:
@@ -125,6 +142,7 @@ def create_game_window():
 
             if best_line:
                 c.itemconfigure(best_line, fill='firebrick')
+        computer_lines.append(best_line)
 
     def click_line(event):
         item = event.widget.find_closest(event.x, event.y)[0]
@@ -133,45 +151,39 @@ def create_game_window():
             c.itemconfigure(item, fill='seagreen')
             line_sound.play()
             computer_move()
+            player_lines.append(item)
             check_game_over()
             
-
-    def reset_canvas():
-        c.delete("all")
-        for i in range(grid_range):
-            for j in range(grid_range2):
-                x = 100 + i * grid_gap
-                y = 100 + j * grid_gap
-                line = c.create_line(x, y, x + grid_gap, y, width=line_width, fill='white')
-                lines.append(line)
-        for j in range(grid_range):
-            for i in range(grid_range2):
-                x = 100 + i * grid_gap
-                y = 100 + j * grid_gap
-                line = c.create_line(x, y, x, y + grid_gap, width=line_width, fill='white')
-                lines.append(line)
-
-        for i in range(grid_size):
-            for j in range(grid_size):
-                x = 100 + i * grid_gap
-                y = 100 + j * grid_gap
-                dot = c.create_oval(x - dot_radius, y - dot_radius, x + dot_radius, y + dot_radius, fill='black')
-                dots.append(dot)
-
     def main_menu():
         play_music()
         game_win.destroy()
         win.deiconify()
 
-    reset_button = Button(game_win, text="Reset", command=reset_canvas, fg='gold', bg='black',width=20)
-    reset_button.pack()
+    def reset_game():
+        c.delete("all")
+        player_lines.clear()
+        computer_lines.clear()
+        for line in lines:
+            c.itemconfigure(line, fill='white')
+        
     main_menu = Button(game_win, text='Main Menu', command= main_menu, fg='gold', bg='black',width=20)
     main_menu.pack()
+    
+    reset_button = Button(game_win, text="Reset", command=reset_game, fg='gold', bg='black',width=20)
+    reset_button.pack()
 
+    player_max_length = count_connected_lines(player_lines)
+    computer_max_length = count_connected_lines(computer_lines)
+    
     def check_game_over():
             white_lines = [line for line in lines if c.itemcget(line, 'fill') == 'white']
             if not white_lines:
                 finish_sound.play()
+            player_max_length = count_connected_lines(player_lines)
+            computer_max_length = count_connected_lines(computer_lines)
+
+            print("Player's max connected lines:", player_max_length)
+            print("Computer's max connected lines:", computer_max_length) 
 
     c.bind('<Button-1>', click_line)
     game_win.mainloop()

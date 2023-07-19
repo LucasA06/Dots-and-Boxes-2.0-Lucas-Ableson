@@ -118,6 +118,20 @@ def create_game_window():
 
         return connected
 
+    def count_connected_lines(lines):
+        visited = {0}
+        max_length = 0
+
+        for line in lines:
+            if line not in visited:
+                connected_lines = find_connected_lines(line, c.itemcget(line, 'fill'), visited)
+                length = len(connected_lines)
+
+                if length > max_length:
+                    max_length = length
+
+        return max_length
+
     def computer_move():
         white_lines = [line for line in lines if c.itemcget(line, 'fill') == 'white']
         if white_lines:
@@ -125,7 +139,7 @@ def create_game_window():
             best_line = None
 
             for line in white_lines:
-                visited = set()
+                visited = {0}
                 connected_lines = find_connected_lines(line, 'seagreen', visited)
                 length = len(connected_lines)
 
@@ -146,10 +160,15 @@ def create_game_window():
             computer_move()
             player_lines.append(item)
             check_game_over()
-            
 
     def reset_canvas():
         c.delete("all")
+
+        # Clear lines and dots
+        lines.clear()
+        dots.clear()
+
+        # Create new lines and dots
         for i in range(grid_range):
             for j in range(grid_range2):
                 x = 100 + i * grid_gap
@@ -169,15 +188,19 @@ def create_game_window():
                 y = 100 + j * grid_gap
                 dot = c.create_oval(x - dot_radius, y - dot_radius, x + dot_radius, y + dot_radius, fill='black')
                 dots.append(dot)
-
+        player_lines.clear()
+        computer_lines.clear()
+    
     def check_game_over():
             white_lines = [line for line in lines if c.itemcget(line, 'fill') == 'white']
             if not white_lines:
                 finish_sound.play()
-            player1_count = len([line for line in player_lines if c.itemcget(line, 'fill') == 'seagreen'])
-            player2_count = len([line for line in computer_lines if c.itemcget(line, 'fill') == 'firebrick'])
+                player_max_length = count_connected_lines(player_lines)
+                computer_max_length = count_connected_lines(computer_lines)
 
-            print(player1_count, player2_count)
+                print("Player's max connected lines:", player_max_length)
+                print("Computer's max connected lines:", computer_max_length) 
+
     def main_menu():
         play_music()
         game_win.destroy()
@@ -231,6 +254,36 @@ def create_game_window2():
     player1_label = Label(game_win, text="Click to start", fg="black",bg='white')
     player1_label.pack()
 
+    def find_connected_lines(item, color, visited):
+        connected = [item]
+        queue = [item]
+
+        while queue:
+            current = queue.pop(0)
+            neighbors = c.find_overlapping(*c.coords(current))
+
+            for neighbor in neighbors:
+                if neighbor in lines and neighbor not in visited and c.itemcget(neighbor, 'fill') == color:
+                    connected.append(neighbor)
+                    visited.add(neighbor)
+                    queue.append(neighbor)
+
+        return connected
+
+    def count_connected_lines(lines):
+        visited = {0}
+        max_length = 0
+
+        for line in lines:
+            if line not in visited:
+                connected_lines = find_connected_lines(line, c.itemcget(line, 'fill'), visited)
+                length = len(connected_lines)
+
+                if length > max_length:
+                    max_length = length
+
+        return max_length
+
     current_player = 1
 
     def click_line(event):
@@ -254,6 +307,12 @@ def create_game_window2():
 
     def reset_canvas():
         c.delete("all")
+
+        # Clear lines and dots
+        lines.clear()
+        dots.clear()
+
+        # Create new lines and dots
         for i in range(grid_range):
             for j in range(grid_range2):
                 x = 100 + i * grid_gap
@@ -273,16 +332,18 @@ def create_game_window2():
                 y = 100 + j * grid_gap
                 dot = c.create_oval(x - dot_radius, y - dot_radius, x + dot_radius, y + dot_radius, fill='black')
                 dots.append(dot)
+        player1_lines.clear()
+        player2_lines.clear()
 
     def check_game_over():
         white_lines = [line for line in lines if c.itemcget(line, 'fill') == 'white']
         if not white_lines:
             finish_sound.play()
-        player1_count = len([line for line in player1_lines if c.itemcget(line, 'fill') == 'firebrick'])
-        player2_count = len([line for line in player2_lines if c.itemcget(line, 'fill') == 'seagreen'])
+            player_max_length = count_connected_lines(player1_lines)
+            player2_max_length = count_connected_lines(player2_lines)
 
-        print(player1_count, player2_count)
-
+            print("Player 1's (Red) max connected lines:", player_max_length)
+            print("Player 2's (Green) max connected lines:", player2_max_length)
 
     def main_menu():
         play_music()

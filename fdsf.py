@@ -118,6 +118,20 @@ def create_game_window():
 
         return connected
 
+    def count_connected_lines(lines):
+        visited = {0}
+        max_length = 0
+
+        for line in lines:
+            if line not in visited:
+                connected_lines = find_connected_lines(line, c.itemcget(line, 'fill'), visited)
+                length = len(connected_lines)
+
+                if length > max_length:
+                    max_length = length
+
+        return max_length
+
     def computer_move():
         white_lines = [line for line in lines if c.itemcget(line, 'fill') == 'white']
         if white_lines:
@@ -146,10 +160,15 @@ def create_game_window():
             computer_move()
             player_lines.append(item)
             check_game_over()
-            
 
     def reset_canvas():
         c.delete("all")
+
+        # Clear lines and dots
+        lines.clear()
+        dots.clear()
+
+        # Create new lines and dots
         for i in range(grid_range):
             for j in range(grid_range2):
                 x = 100 + i * grid_gap
@@ -169,8 +188,45 @@ def create_game_window():
                 y = 100 + j * grid_gap
                 dot = c.create_oval(x - dot_radius, y - dot_radius, x + dot_radius, y + dot_radius, fill='black')
                 dots.append(dot)
-    player_lines.clear()
-    computer_lines.clear()
+        player_lines.clear()
+        computer_lines.clear()
+
+    def check_game_over():
+        white_lines = [line for line in lines if c.itemcget(line, 'fill') == 'white']
+        if not white_lines:
+            finish_sound.play()
+            player_max_length = count_connected_lines(player_lines)
+            computer_max_length = count_connected_lines(computer_lines)
+
+            winner = "Player" if player_max_length > computer_max_length else "Computer"
+            max_length = max(player_max_length, computer_max_length)
+
+            show_winner(max_length, winner)
+
+    def show_winner(max_length, winner):
+        winner_win = Toplevel(win)
+        winner_win.geometry("300x200")
+        winner_win.title('Game Over')
+
+        winner_label = Label(winner_win, text="The Winner Is:", font=('Oswald', 20), fg='black')
+        winner_label.pack()
+
+        winner_name = Label(winner_win, text=winner, font=('Oswald', 24, 'bold'), fg='gold')
+        winner_name.pack()
+
+        max_length_label = Label(winner_win, text="Max Length: " + str(max_length - 1), font=('Oswald', 18), fg='black')
+        max_length_label.pack()
+
+        def close_windows():
+            game_win.destroy()
+            winner_win.destroy()
+            win.deiconify()
+
+        close_button = Button(winner_win, text="Close", command=close_windows, font=('Arial', 14), fg='black', bg='skyblue')
+        close_button.pack()
+
+        # Update the protocol for the winner window to call close_windows() when closed
+        winner_win.protocol("WM_DELETE_WINDOW", close_windows)
 
     def main_menu():
         play_music()
@@ -181,30 +237,6 @@ def create_game_window():
     reset_button.pack()
     main_menu = Button(game_win, text='Main Menu', command= main_menu, fg='gold', bg='black',width=20)
     main_menu.pack()
-
-    def count_connected_lines(lines):
-        visited = {0}
-        max_length = 0
-
-        for line in lines:
-            if line not in visited:
-                connected_lines = find_connected_lines(line, c.itemcget(line, 'fill'), visited)
-                length = len(connected_lines)
-
-                if length > max_length:
-                    max_length = length
-
-        return max_length
-    
-    def check_game_over():
-            white_lines = [line for line in lines if c.itemcget(line, 'fill') == 'white']
-            if not white_lines:
-                finish_sound.play()
-            player_max_length = count_connected_lines(player_lines)
-            computer_max_length = count_connected_lines(computer_lines)
-
-            print("Player's max connected lines:", player_max_length)
-            print("Computer's max connected lines:", computer_max_length) 
 
     c.bind('<Button-1>', click_line)
     game_win.mainloop()
@@ -246,6 +278,36 @@ def create_game_window2():
     player1_label = Label(game_win, text="Click to start", fg="black",bg='white')
     player1_label.pack()
 
+    def find_connected_lines(item, color, visited):
+        connected = [item]
+        queue = [item]
+
+        while queue:
+            current = queue.pop(0)
+            neighbors = c.find_overlapping(*c.coords(current))
+
+            for neighbor in neighbors:
+                if neighbor in lines and neighbor not in visited and c.itemcget(neighbor, 'fill') == color:
+                    connected.append(neighbor)
+                    visited.add(neighbor)
+                    queue.append(neighbor)
+
+        return connected
+
+    def count_connected_lines(lines):
+        visited = {0}
+        max_length = 0
+
+        for line in lines:
+            if line not in visited:
+                connected_lines = find_connected_lines(line, c.itemcget(line, 'fill'), visited)
+                length = len(connected_lines)
+
+                if length > max_length:
+                    max_length = length
+
+        return max_length
+
     current_player = 1
 
     def click_line(event):
@@ -267,49 +329,73 @@ def create_game_window2():
                 current_player = 1
         check_game_over()
 
-    def reset_button():
-        python = sys.executable
-        os.execl(python, python, * sys.argv)
+    def reset_canvas():
+        c.delete("all")
 
-    def find_connected_lines(item, color, visited):
-        connected = [item]
-        queue = [item]
+        # Clear lines and dots
+        lines.clear()
+        dots.clear()
 
-        while queue:
-            current = queue.pop(0)
-            neighbors = c.find_overlapping(*c.coords(current))
+        # Create new lines and dots
+        for i in range(grid_range):
+            for j in range(grid_range2):
+                x = 100 + i * grid_gap
+                y = 100 + j * grid_gap
+                line = c.create_line(x, y, x + grid_gap, y, width=line_width, fill='white')
+                lines.append(line)
+        for j in range(grid_range):
+            for i in range(grid_range2):
+                x = 100 + i * grid_gap
+                y = 100 + j * grid_gap
+                line = c.create_line(x, y, x, y + grid_gap, width=line_width, fill='white')
+                lines.append(line)
 
-            for neighbor in neighbors:
-                if neighbor in lines and neighbor not in visited and c.itemcget(neighbor, 'fill') == color:
-                    connected.append(neighbor)
-                    visited.add(neighbor)
-                    queue.append(neighbor)
-
-        return connected
-    
-    def count_connected_lines(lines):
-        visited = {0}
-        max_length = 0
-
-        for line in lines:
-            if line not in visited:
-             connected_lines = find_connected_lines(line, c.itemcget(line, 'fill'), visited)
-            length = len(connected_lines)
-
-            if length > max_length:
-                max_length = length
-
-        return max_length
+        for i in range(grid_size):
+            for j in range(grid_size):
+                x = 100 + i * grid_gap
+                y = 100 + j * grid_gap
+                dot = c.create_oval(x - dot_radius, y - dot_radius, x + dot_radius, y + dot_radius, fill='black')
+                dots.append(dot)
+        player1_lines.clear()
+        player2_lines.clear()
 
     def check_game_over():
         white_lines = [line for line in lines if c.itemcget(line, 'fill') == 'white']
         if not white_lines:
             finish_sound.play()
-            player_max_length = count_connected_lines(player1_lines)
+            player1_max_length = count_connected_lines(player1_lines)
             player2_max_length = count_connected_lines(player2_lines)
 
-            print("Player's max connected lines:", player_max_length)
-            print("Player2's max connected lines:", player2_max_length) 
+            winner = "Player 1" if player1_max_length > player2_max_length else "Player 2"
+            max_length = max(player1_max_length, player2_max_length)
+
+            game_win.destroy()
+            show_winner(max_length, winner)
+
+    def show_winner(max_length, winner):
+        winner_win = Toplevel(win)
+        winner_win.geometry("300x200")
+        winner_win.title('Game Over')
+
+        winner_label = Label(winner_win, text="The winner is:", font=('Arial Black', 20), fg='black')
+        winner_label.pack()
+
+        winner_name = Label(winner_win, text=winner, font=('Arial Black', 24, 'bold'), fg='purple')
+        winner_name.pack()
+
+        max_length_label = Label(winner_win, text="Max Length: " + str(max_length), font=('Arial', 18), fg='black')
+        max_length_label.pack()
+
+        def close_windows():
+            winner_win.destroy()
+            win.deiconify()
+
+
+        close_button = Button(winner_win, text="Close", command=close_windows, font=('Arial', 14), fg='black', bg='skyblue')
+        close_button.pack()
+
+        # Update the protocol for the winner window to call close_windows() when closed
+        winner_win.protocol("WM_DELETE_WINDOW", close_windows)
 
 
     def main_menu():
@@ -317,7 +403,7 @@ def create_game_window2():
         game_win.destroy()
         win.deiconify()
 
-    reset_button = Button(game_win, text="Reset", command=reset_button, fg='gold', bg='black',width=20)
+    reset_button = Button(game_win, text="Reset", command=reset_canvas, fg='gold', bg='black',width=20)
     reset_button.pack()
     main_menu = Button(game_win, text='Main Menu', command= main_menu, fg='gold', bg='black',width=20)
     main_menu.pack()
@@ -326,4 +412,3 @@ def create_game_window2():
     game_win.mainloop()
 
 win.mainloop()
-
