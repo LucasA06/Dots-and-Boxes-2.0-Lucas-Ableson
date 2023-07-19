@@ -1,6 +1,4 @@
 from tkinter import *
-import sys
-import os
 from tkVideoPlayer import TkinterVideo
 import pygame
 
