@@ -164,11 +164,9 @@ def create_game_window():
     def reset_canvas():
         c.delete("all")
 
-        # Clear lines and dots
         lines.clear()
         dots.clear()
 
-        # Create new lines and dots
         for i in range(grid_range):
             for j in range(grid_range2):
                 x = 100 + i * grid_gap
@@ -198,35 +196,23 @@ def create_game_window():
             player_max_length = count_connected_lines(player_lines)
             computer_max_length = count_connected_lines(computer_lines)
 
-            winner = "Player" if player_max_length > computer_max_length else "Computer"
-            max_length = max(player_max_length, computer_max_length)
+            if player_max_length == computer_max_length:
+                show_winner(game_win, player_max_length, "TIE")
+            elif player_max_length > computer_max_length:
+                show_winner(game_win, player_max_length, "PLAYER")
+            else:
+                show_winner(game_win, computer_max_length, "COMPUTER")
 
-            show_winner(max_length, winner)
-
-    def show_winner(max_length, winner):
-        winner_win = Toplevel(win)
-        winner_win.geometry("300x200")
-        winner_win.title('Game Over')
-
-        winner_label = Label(winner_win, text="The Winner Is:", font=('Oswald', 20), fg='black')
-        winner_label.pack()
-
-        winner_name = Label(winner_win, text=winner, font=('Oswald', 24, 'bold'), fg='gold')
-        winner_name.pack()
-
-        max_length_label = Label(winner_win, text="Max Length: " + str(max_length - 1), font=('Oswald', 18), fg='black')
-        max_length_label.pack()
-
-        def close_windows():
-            game_win.destroy()
-            winner_win.destroy()
-            win.deiconify()
-
-        close_button = Button(winner_win, text="Close", command=close_windows, font=('Arial', 14), fg='black', bg='skyblue')
-        close_button.pack()
-
-        # Update the protocol for the winner window to call close_windows() when closed
-        winner_win.protocol("WM_DELETE_WINDOW", close_windows)
+    def show_winner(window, max_length, winner):
+        c.create_text(250, 20, text="The Winner Is:", font=('Oswald', 11), fill='black')
+        if winner == "TIE":
+            bg_color = 'gold'
+        elif winner == "PLAYER":
+            bg_color = 'seagreen'
+        else:
+            bg_color = 'firebrick'
+        c.create_text(250, 40, text=winner, font=('Oswald', 17, 'bold'), fill=bg_color)
+        c.create_text(250, 60, text="Length: " + str(max_length - 1), font=('Oswald', 11), fill='black')
 
     def main_menu():
         play_music()
@@ -332,11 +318,10 @@ def create_game_window2():
     def reset_canvas():
         c.delete("all")
 
-        # Clear lines and dots
+
         lines.clear()
         dots.clear()
 
-        # Create new lines and dots
         for i in range(grid_range):
             for j in range(grid_range2):
                 x = 100 + i * grid_gap
@@ -366,37 +351,23 @@ def create_game_window2():
             player1_max_length = count_connected_lines(player1_lines)
             player2_max_length = count_connected_lines(player2_lines)
 
-            winner = "Player 1" if player1_max_length > player2_max_length else "Player 2"
-            max_length = max(player1_max_length, player2_max_length)
+            if player1_max_length == player2_max_length:
+                show_winner(game_win, player1_max_length, "TIE")
+            elif player1_max_length > player2_max_length:
+                show_winner(game_win, player1_max_length, "PLAYER 1")
+            else:
+                show_winner(game_win, player2_max_length, "PLAYER 2")
 
-            game_win.destroy()
-            show_winner(max_length, winner)
-
-    def show_winner(max_length, winner):
-        winner_win = Toplevel(win)
-        winner_win.geometry("300x200")
-        winner_win.title('Game Over')
-
-        winner_label = Label(winner_win, text="The winner is:", font=('Arial Black', 20), fg='black')
-        winner_label.pack()
-
-        winner_name = Label(winner_win, text=winner, font=('Arial Black', 24, 'bold'), fg='purple')
-        winner_name.pack()
-
-        max_length_label = Label(winner_win, text="Max Length: " + str(max_length), font=('Arial', 18), fg='black')
-        max_length_label.pack()
-
-        def close_windows():
-            winner_win.destroy()
-            win.deiconify()
-
-
-        close_button = Button(winner_win, text="Close", command=close_windows, font=('Arial', 14), fg='black', bg='skyblue')
-        close_button.pack()
-
-        # Update the protocol for the winner window to call close_windows() when closed
-        winner_win.protocol("WM_DELETE_WINDOW", close_windows)
-
+    def show_winner(window, max_length, winner):
+        c.create_text(250, 20, text="The Winner Is:", font=('Oswald', 11), fill='black')
+        if winner == "TIE":
+            bg_color = 'gold'
+        elif "1" in winner:
+            bg_color = 'firebrick'
+        else:
+            bg_color = 'seagreen'
+        c.create_text(250, 40, text=winner, font=('Oswald', 17, 'bold'), fill=bg_color)
+        c.create_text(250, 60, text="Length: " + str(max_length - 1), font=('Oswald', 11), fill='black')
 
     def main_menu():
         play_music()

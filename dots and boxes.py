@@ -93,7 +93,6 @@ def create_game_window():
             dot = c.create_oval(x - dot_radius, y - dot_radius, x + dot_radius, y + dot_radius, fill='black')
             dots.append(dot)
 
-    # Player and computer labels
     welcome_label = Label(game_win, text="Click a gap between dots to start the game!!", fg='black',font= (20),bg='white')
     welcome_label.pack()
     player_label = Label(game_win, text="You are Green", fg="seagreen",bg='white')
@@ -164,11 +163,9 @@ def create_game_window():
     def reset_canvas():
         c.delete("all")
 
-        # Clear lines and dots
         lines.clear()
         dots.clear()
 
-        # Create new lines and dots
         for i in range(grid_range):
             for j in range(grid_range2):
                 x = 100 + i * grid_gap
@@ -190,24 +187,36 @@ def create_game_window():
                 dots.append(dot)
         player_lines.clear()
         computer_lines.clear()
-    
-    def check_game_over():
-            white_lines = [line for line in lines if c.itemcget(line, 'fill') == 'white']
-            if not white_lines:
-                finish_sound.play()
-                player_max_length = count_connected_lines(player_lines)
-                computer_max_length = count_connected_lines(computer_lines)
 
-                print("Player's max connected lines:", player_max_length)
-                print("Computer's max connected lines:", computer_max_length) 
+    def check_game_over():
+        white_lines = [line for line in lines if c.itemcget(line, 'fill') == 'white']
+        if not white_lines:
+            finish_sound.play()
+            player_max_length = count_connected_lines(player_lines)
+            computer_max_length = count_connected_lines(computer_lines)
+
+            if player_max_length == computer_max_length:
+                show_winner(game_win, player_max_length, "TIE")
+            elif player_max_length > computer_max_length:
+                show_winner(game_win, player_max_length, "PLAYER")
+            else:
+                show_winner(game_win, computer_max_length, "COMPUTER")
+
+    def show_winner(window, max_length, winner):
+        c.create_text(250, 20, text="The Winner Is:", font=('Oswald', 11), fill='black')
+        if winner == "TIE":
+            bg_color = 'gold'
+        elif winner == "PLAYER":
+            bg_color = 'seagreen'
+        else:
+            bg_color = 'firebrick'
+        c.create_text(250, 40, text=winner, font=('Oswald', 17, 'bold'), fill=bg_color)
+        c.create_text(250, 60, text="Length: " + str(max_length - 1), font=('Oswald', 11), fill='black')
 
     def main_menu():
         play_music()
         game_win.destroy()
         win.deiconify()
-
-        return player_lines, computer_lines
-    print(player_lines, computer_lines)
 
     reset_button = Button(game_win, text="Reset", command=reset_canvas, fg='gold', bg='black',width=20)
     reset_button.pack()
@@ -308,11 +317,10 @@ def create_game_window2():
     def reset_canvas():
         c.delete("all")
 
-        # Clear lines and dots
+
         lines.clear()
         dots.clear()
 
-        # Create new lines and dots
         for i in range(grid_range):
             for j in range(grid_range2):
                 x = 100 + i * grid_gap
@@ -339,11 +347,26 @@ def create_game_window2():
         white_lines = [line for line in lines if c.itemcget(line, 'fill') == 'white']
         if not white_lines:
             finish_sound.play()
-            player_max_length = count_connected_lines(player1_lines)
+            player1_max_length = count_connected_lines(player1_lines)
             player2_max_length = count_connected_lines(player2_lines)
 
-            print("Player 1's (Red) max connected lines:", player_max_length)
-            print("Player 2's (Green) max connected lines:", player2_max_length)
+            if player1_max_length == player2_max_length:
+                show_winner(game_win, player1_max_length, "TIE")
+            elif player1_max_length > player2_max_length:
+                show_winner(game_win, player1_max_length, "PLAYER 1")
+            else:
+                show_winner(game_win, player2_max_length, "PLAYER 2")
+
+    def show_winner(window, max_length, winner):
+        c.create_text(250, 20, text="The Winner Is:", font=('Oswald', 11), fill='black')
+        if winner == "TIE":
+            bg_color = 'gold'
+        elif "1" in winner:
+            bg_color = 'firebrick'
+        else:
+            bg_color = 'seagreen'
+        c.create_text(250, 40, text=winner, font=('Oswald', 17, 'bold'), fill=bg_color)
+        c.create_text(250, 60, text="Length: " + str(max_length - 1), font=('Oswald', 11), fill='black')
 
     def main_menu():
         play_music()
