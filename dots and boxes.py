@@ -44,6 +44,8 @@ def start_game_computer():
     stop_music()  # Stop the music
     win.withdraw()
     create_game_window()
+   
+    
 
 def start_game_two_players():
     stop_music()  # Stop the music
@@ -58,6 +60,7 @@ two_player_button = Button(win, text="Play Against Friend", command=start_game_t
 two_player_button.place(x=200, y=300)
 quit_button = Button(win, text="QUIT", command=win.destroy, fg='black', bg='firebrick', font=('Oswald',15,'bold'), width=20,height=2, activebackground='purple', activeforeground='black', relief='flat')
 quit_button.place(x=200, y=460)
+
 
 def create_game_window():
     game_win = Toplevel(win,bg='white')
