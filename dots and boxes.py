@@ -43,9 +43,7 @@ finish_sound = pygame.mixer.Sound("3.wav")
 def start_game_computer():
     stop_music()  # Stop the music
     win.withdraw()
-    create_game_window()
-   
-    
+    create_game_window()    
 
 def start_game_two_players():
     stop_music()  # Stop the music
@@ -317,8 +315,6 @@ def create_game_window2():
 
     def reset_canvas():
         c.delete("all")
-
-
         lines.clear()
         dots.clear()
 
